@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <title>ProblemList</title>
+    <style>
+        #submission {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #submission td,
+        #submission th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        #submission tr:hover {
+            background-color: #ddd;
+        }
+
+        #submission th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #333333;
+            color: white;
+        }
+
+        #btn {
+            background-color: transparent;
+            border: none;
+            color: black;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.6;
+            transition: 0.3s;
+            padding-left: 0;
+            padding-right: 0;
+            font-weight: 600;
+            width: 80%;
+        }
+
+        #btn:hover {
+            opacity: 1;
+            background-color: #E4E6E9;
+        }
+
+        .side-btn:hover {
+            transform: scale(1.125);
+        }
+
+        .side-header {
+            font-size: 1.125rem;
+            font-weight: 750;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f0f2f5;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+        style="position: fixed; width:100%; top: 0px;z-index: 1000;">
+        <h3><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-0">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username"
+                    aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="button-addon2"><i
+                            class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+        </form>
+        <span
+            style="color:white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i
+                class="fas fa-users"></i>&nbsp;Hello, {{user.name}} &nbsp;</span>
+                <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                        onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                        href="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="profile?profileid={{user.userid}}"> <i class="far fa-user"></i>
+                &nbsp;Profile</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="chatbox?profileid={{user.userid}}"> <i
+                    class="far fa-envelope"></i>&nbsp;Messages</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout</a>&nbsp;&nbsp;</span>
+    </nav>
+    <br><br>
+
+    <div style="display: flex;overflow-y:scroll;height:90%;margin-top:20px;">
+        <div style="width:20%;position: fixed;left:15px;">
+            <div style="width:100%;display:flex;height:5vh;justify-content: space-between;margin-bottom: 1vh;">
+                <button id="btn" style="width:50%;border:none;" id="allsubb" onclick="allsub()">All Submission</button>
+                <div style="width:0.1vw;background-color: black;"></div>
+                <button id="btn" style="width:50%;border:none;" id="mysubb" onclick="mysub()">My Submission</button>
+            </div>
+            <div id="allsubs">
+                <table id="submission">
+                    <tr>
+                        <th>User</th>
+                        <th>Lang</th>
+                        <th>Score</th>
+                        <th>Solution</th>
+                    </tr>
+                    {% for each in subs %}
+                    <tr>
+                        <td>{{each.userid}}</td>
+                        <td>{{each.langname}}</td>
+                        <td>{{each.score}}</td>
+                        <td><a href="solution?submissionid={{each.submissionid}}">view</a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div id="mysubs">
+                <table id="submission">
+                    <tr>
+                        <th>User</th>
+                        <th>Lang</th>
+                        <th>Score</th>
+                        <th>Solution</th>
+                    </tr>
+                    {% for each in subs %}
+                    {% if each.userid == user.userid %}
+                    <tr>
+                        <td>{{each.userid}}</td>
+                        <td>{{each.langname}}</td>
+                        <td>{{each.score}}</td><td><a href="solution?submissionid={{each.submissionid}}">view</a></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <div style="width:55%;margin-right: 23%;margin-left: 23%;">
+            {% if messages %}
+            {% for message in messages %}
+            <div class='alert alert-{{ message.tags }}'>
+                <center>{{ message }}</center>
+            </div>
+            {% endfor %}
+            {% endif %}
+            <div>
+                <div style="display:flex;justify-content: space-between;margin-bottom: 1vh;">
+                    <h3>{{problem.title}} - {{problem.problemcode}}</h3>
+                    <a class="btn" style="background-color:#343a40;color:white;width:10vw;"
+                        href="compiler?problemid={{problem.problemid}}">Submit</a>
+                </div>
+                <div id="mybody1" class="card" style="padding: 10px 10px 10px 10px;">
+                    {{problem.description}}
+                </div>
+                <a class="btn" style="background-color:#343a40;color:white;width:100%;margin-top: 1vh"
+                    href="compiler?problemid={{problem.problemid}}">Submit</a>
+            </div>
+        </div>
+
+        <div style="align-items:center;text-align: center;width:20%;position: fixed;right: 15px;">
+            <p class="side-header">IDE</p>
+            <p><a class="btn side-btn" id="btn" href="compiler?problemid=false">Online IDE
+                </a></p>
+            <br>
+            <hr>
+            <br>
+            <p class="side-header">Practice</p>
+            <a class="btn side-btn" id="btn" href="problemlist">Problems <br /> (all Problem List)
+            </a></p>
+            <p><a class="btn side-btn" id="btn" href="problemlistsort">Problems <br /> (by Difficulty Level)
+                </a></p>
+            <br>
+            <hr>
+            <!-- <p class="side-header">Contests</p>
+                                <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Present Contests
+                                    </a></p>
+                                <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Upcoming Contests
+                                    </a></p>
+                                <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Past Contests
+                                    </a></p>
+                                <hr> -->
+            <br>
+            <p class="side-header">Administration</p>
+            <p><a class="btn side-btn" id="btn" href="admin">Admin
+                </a></p>
+            </div>
+    </div>
+</body>
+<script type="text/javascript">
+
+    document.getElementById('mysubs').style.display = 'none';
+    document.getElementById('allsubs').style.display = 'inline';
+
+    function mysub() {
+        document.getElementById('mysubs').style.display = 'inline';
+        document.getElementById('allsubs').style.display = 'none';
+    }
+    function allsub() {
+        document.getElementById('mysubs').style.display = 'none';
+        document.getElementById('allsubs').style.display = 'inline';
+    }
+</script>
+
+</html>

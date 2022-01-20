@@ -1,0 +1,198 @@
+{% load static %}
+<html>
+    <head>    
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+        <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
+        <title>{{name}} - Chat</title>
+        <style>
+            #image,#audio {
+                position: fixed;
+                display: none;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 2;
+                cursor: pointer;
+            }
+            #inner{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                font-size: 50px;
+                color: white;
+                transform: translate(-50%,-50%);
+                -ms-transform: translate(-50%,-50%);
+            }
+        </style>
+    </head>
+    <body onload="window.scrollTo(0,document.body.scrollHeight);">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; width:100%; top: 0px;z-index: 1000;">
+        <h3><a class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button> 
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-0">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" id="button-addon2"><i class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+        </form>
+        <span style="color:white" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fas fa-users"></i>&nbsp;Hello, {{name}}  &nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="profile?profileid={{userid}}"> <i class="far fa-user"></i> &nbsp;Profile</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="chatbox?profileid={{userid}}"> <i class="far fa-envelope"></i>&nbsp;Messages</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout</a>&nbsp;&nbsp;</span>
+    </nav>
+    <br><br><br>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-lg-12">
+                <div class="card chat-app">
+                    <div style="height:640px">
+                        <div id="plist" class="people-list" style="margin:5px;padding:5px;width:270px;height:630px;overflow:auto;text-align:justify;">
+                            <div style="height:640px">
+                            <ul class="list-unstyled chat-list mt-2 mb-1">
+                            {% for people in friends %}
+                                    <li class="clearfix" >
+                                        <a href='chatmessages?profileid={{people.userid}}' style='color: inherit;text-decoration: inherit;'>
+                                        <img src="{{ people.profilepic.url }}" height="40" width="50" alt="avatar">
+                                        <div class="about">
+                                            <div class="name">{{people.name}}</div>
+                                            {% if people.userid in online %}
+                                                    <i class="fas fa-circle" style="color:rgb(69, 122, 69);font-size: 70%;"></i>&nbsp;<small>Online</small>
+                                            {% else %}
+                                                <i class="fas fa-circle" style="color:rgb(124, 53, 53);font-size: 70%;"></i>&nbsp;<small>&nbsp;Offline</small>
+                                            {% endif %}                                     
+                                        </div>
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                            </div>  
+                        </div>
+                        <div class="chat">
+                            <div style="height:640px">
+                                {% if status %}
+                                <div class="chat-header clearfix">
+                                    <a href='profile?profileid={{recipient.userid}}' style='color: inherit;text-decoration: inherit;'>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <img src="{{recipient.profilepic.url}}" style="height:50px;width:50px;">
+                                            <div class="chat-about" style="margin-left: 10px;">
+                                                <h6 class="m-b-0">{{recipient.name}}</h6>
+                                                {% if recipient.userid in online %}
+                                                    <i class="fas fa-circle" style="color:rgb(69, 122, 69);font-size: 70%;"></i>&nbsp;<small>Online</small>
+                                            {% else %}
+                                                <i class="fas fa-circle" style="color:rgb(124, 53, 53);font-size: 70%;"></i>&nbsp;<small>&nbsp;Last seen: {{recipient.logintime}}</small>
+                                            {% endif %} 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                </div>
+                                <div id="div1" class="chat-history" style="height:500px;overflow:auto;text-align:justify;">
+                                    <ul class="m-b-10">
+                                        {% for msg in message %}
+                                            {% if forloop.last %}
+                                            <li class="clearfix" id="focus">
+                                            {% else %}
+                                            <li class="clearfix">
+                                            {% endif %}
+                                            {% if msg.fuserid == userid %}
+                                                <div class="message-data text-right">
+                                                    <span class="message-data-time"><small>{{msg.datetime}}</small></span>
+                                                </div>
+                                                {% if msg.linkmessage != 'NULL' %}
+                                                <a href='{{msg.linkmessage}}'>
+                                                {% endif %}
+                                                <div class="message other-message float-right">
+                                                {% if msg.picturemessage != '' %}
+                                                    <img height="200" width="200" src="{{ msg.picturemessage.url }}"><br>
+                                                {% endif %}
+                                                {% if msg.audiomessage != '' %}
+                                                    <audio controls>
+                                                    <source src="{{ msg.audiomessage.url }}" type="audio/mpeg">
+                                                    </audio>
+                                                {% endif %}
+                                                {% if msg.textmessage != 'NULL'%}
+                                                    {{msg.textmessage}}
+                                                {% endif %}
+                                                </div>
+                                                {% if msg.linkmessage != 'NULL' %}
+                                                    </a>
+                                                {% endif %}
+                                            </li>
+                                            {% else %}
+                                                <div class="message-data">
+                                                    <span class="message-data-time"><small>{{msg.datetime}}</small></span>
+                                                </div>
+                                                {% if msg.linkmessage != 'NULL' %}
+                                                <a href='{{msg.linkmessage}}'>
+                                                {% endif %}
+                                                <div class="message my-message">
+                                                {% if msg.picturemessage != '' %}
+                                                    <img height="200" width="200" src="{{ msg.picturemessage.url }}">
+                                                {% endif %}
+                                                {% if msg.audiomessage != '' %}
+                                                    <audio controls>
+                                                    <source src="{{ msg.audiomessage.url }}" type="audio/mpeg">
+                                                    </audio>
+                                                {% endif %}
+                                                {% if msg.textmessage != 'NULL' %}
+                                                    {{msg.textmessage}}
+                                                {% endif %}      
+                                                </div>
+                                                {% if msg.linkmessage != 'NULL' %}
+                                                    </a>
+                                                {% endif %}                          
+                                            </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <form action="sendmsg" method="POST" enctype="multipart/form-data">        
+                                {% csrf_token %}
+                                <div class="chat-message clearfix" style="position: absolute;bottom:10;width:70%;">
+                                    <div class="input-group mb-0" style="position: absolute;bottom:0;">
+                                        <input type="hidden" name="profileid" value="{{recipient.userid}}"/>
+                                        <input type="text" name="message" class="form-control" placeholder="Type a message">  
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><a href="picturemsg?profileid={{recipient.userid}}"><i class="fas fa-image"></i></a></span>
+                                            <span class="input-group-text"><a href="audiomsg?profileid={{recipient.userid}}"><i class="far fa-file-audio"></i></a></span>
+                                            <span class="input-group-text"><button style="border:none;"><i class="fas fa-paper-plane"></i></button></span>
+                                        </div>                               
+                                    </div>
+                                </div></form>  
+                                {% else %}
+                                    <div style="padding-left: 30%;padding-top: 10%;">
+                                        <img class="img-fluid"  height="300" width="300"  src="{% static 'assets/img/logo1.png' %}"/>
+                                    </div><br>
+                                    <center>
+                                        <h4>Instant Messaging Service</h4><br>
+                                        <h6>Select the User</h6>
+                                    </center>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$("#div1").animate({ scrollTop: $('#div1').prop("scrollHeight")}, 0);
+</script>
+</html>

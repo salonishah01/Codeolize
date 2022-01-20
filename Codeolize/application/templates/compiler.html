@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+
+    <link rel="stylesheet" type="text/css" href="https://codemirror.net/lib/codemirror.css" />
+    <link rel="stylesheet" type="text/css" href="https://codemirror.net/theme/abbott.css" />
+
+    <title>{{user.name}} - Feed</title>
+    <style>
+
+        .CodeMirror{
+            height: 80vh;
+            width:60vw;
+        }
+
+        .cm-s-abbott.CodeMirror{
+            background: #303841;
+        }
+        .editor {
+            margin-left: 2vw;
+        }
+
+        .editor__main {
+            display: flex;
+            justify-content: space-around;
+            height: 80vh;
+            width: 77vw;
+        }
+
+        .editor__code {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor__io {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .ide {
+            background-color: #fffff3;
+            width: 60vw;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .editor__submit {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-around;
+            width: 60vw;
+        }
+        .editor__submit__btn {
+            width: 25%;
+        }
+        .root{
+            margin-top:10vh;
+            margin-left: 2vw;
+            display: flex;
+            justify-content:space-between;
+        }
+        #btn{
+            background-color:transparent;
+            border:none;
+            color: black;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.6;
+            transition: 0.3s;
+            padding-left:0;
+            padding-right:0;
+            font-weight: 600;
+        }
+        #btn:hover {
+            opacity: 1;
+        }
+        .side-btn:hover{
+            transform: scale(1.125);
+        }
+        h3{
+            opacity:0.75
+        }
+        .side-header{
+            font-size: 1.125rem;
+            font-weight: 750;
+        }#btn{
+            background-color:transparent;
+            border:none;
+            color: black;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.6;
+            transition: 0.3s;
+            padding-left:0;
+            padding-right:0;
+            font-weight: 600;
+            width:80%;
+        }
+        #btn:hover {
+            opacity: 1;
+            background-color: #E4E6E9;
+        }
+        .side-btn:hover{
+            transform: scale(1.125);
+        }
+        h3{
+            opacity:0.75
+        }
+        .side-header{
+            font-size: 1.125rem;
+            font-weight: 750;
+        }
+    </style>
+
+</head>
+
+<body style="background-color: #f0f2f5;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+        style="position: fixed; width:100%; top: 0px;z-index: 1000;">
+        <h3><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-0">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username"
+                    aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="button-addon2"><i
+                            class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+        </form>
+        <span
+            style="color:white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i
+                class="fas fa-users"></i>&nbsp;Hello, {{user.name}} &nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="profile?profileid={{user.userid}}"> <i class="far fa-user"></i>
+                &nbsp;Profile</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="chatbox?profileid={{user.userid}}"> <i
+                    class="far fa-envelope"></i>&nbsp;Messages</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout</a>&nbsp;&nbsp;</span>
+    </nav>
+    <div class="root">
+        <form name="codecompiler" action="execute" method="POST">
+            {% csrf_token %}
+            <div class="editxor">
+                {% if messages %}
+                {% for message in messages %}
+                <div class='alert alert-{{ message.tags }}'>
+                    <center>{{ message }}</center>
+                </div>
+                {% endfor %}
+                {% endif %}
+                <div class="editor__main">
+                    <div class="editor__code">
+                        <select name="language" id="language" style="padding:0.625rem 0.5rem;background-color: #fffff9;">
+                            <option value="{{curlan.id}}">{{curlan.name}}</option>
+                            {% for each in language %}
+                                {% if each.id != curlan.id %}
+                                <option value="{{each.id}}">{{each.name}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <textarea id="code" name="code" type="text">{{code}}</textarea>
+                        <!-- <textarea name="code" placeholder="Enter your code" type="text" rows="500"
+                            class="ide">{{code}}</textarea> -->
+                    </div>
+                    <div class="editor__io" id="input">
+                        <input type="hidden" name="problemid" value="{{problemid}}" />
+                        <label>Input:</label>
+                        <textarea name="input" style="background-color:#303841;margin-bottom: 1vh;color:white" type="text" rows="500"
+                            style="height: 38vh;">{{input}}</textarea>
+                        <label>Output:</label>
+                        <textarea name="output" style="background-color:#303841;color:white" type="text" rows="500"
+                            style="height: 38vh;">{{output}}</textarea>
+                    </div>
+                </div>
+
+                <div class="editor__submit">
+                    <button class="btn editor__submit__btn" name="run"
+                        style="background-color: #343a40;border:none;color: white;" id="compile1">Run</button>
+                    {% if isproblem %}
+                    <button class="btn editor__submit__btn" name="submit"
+                        style="background-color: #343a40;border:none;color: white;" id="compile2">Submit</button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+
+        <div style="align-items:center;text-align: center;width:15%;position: fixed;right: 15px;margin-top: 5vh;">
+            <p class="side-header">IDE</p>
+            <p><a class="btn side-btn" id="btn" href="compiler?problemid=false">Online IDE
+                </a></p>
+            <br>
+            <hr>
+            <br>
+            <p class="side-header">Practice</p>
+            <a class="btn side-btn" id="btn" href="problemlist">Problems <br /> (all Problem List)
+            </a></p>
+            <p><a class="btn side-btn" id="btn" href="problemlistsort">Problems <br /> (by Difficulty Level)
+                </a></p>
+            <br>
+            <hr>
+            <!-- <p class="side-header">Contests</p>
+                    <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Present Contests
+                        </a></p>
+                    <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Upcoming Contests
+                        </a></p>
+                    <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Past Contests
+                        </a></p>
+                    <hr> -->
+            <br>
+            <p class="side-header">Administration</p>
+            <p><a class="btn side-btn" id="btn" href="admin">Admin
+                </a></p>
+        </div>
+    </div>
+</body>
+<script language="javascript" type="text/javascript" src="https://codemirror.net/lib/codemirror.js"></script>
+<script language="javascript" type="text/javascript" src="https://codemirror.net/mode/perl/perl.js"></script>
+<script type="text/javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+            lineNumbers: true,
+            mode: 'text/x-perl',
+            theme: 'abbott',
+        });
+    document.getElementById("compile1").addEventListener("click", function (event) {
+        let value = document.forms["codecompiler"]["language"].value;
+        if(value=="-1")
+        {
+            alert("Please select a language")
+            event.preventDefault()
+        }
+    });
+    document.getElementById("compile2").addEventListener("click", function (event) {
+            let value = document.forms["codecompiler"]["language"].value;
+            if (value == "-1") {
+                alert("Please select a language")
+                event.preventDefault()
+            }
+        });
+</script>
+</html>

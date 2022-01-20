@@ -1,0 +1,97 @@
+{% load static %}
+<html>
+    <head>    
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+        <link rel="stylesheet" href="{% static 'css/chat.css' %}" />
+        <title>{{name}} - Chat</title>
+        <style>
+            #image,#audio {
+                position: fixed;
+                display: none;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 2;
+                cursor: pointer;
+            }
+            #inner{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                font-size: 50px;
+                color: white;
+                transform: translate(-50%,-50%);
+                -ms-transform: translate(-50%,-50%);
+            }
+        </style>
+    </head>
+    <body onload="window.scrollTo(0,document.body.scrollHeight);">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; width:100%; top: 0px;z-index: 1000;">
+        <h3><a class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button> 
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-0">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" id="button-addon2"><i class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+        </form>
+        <span style="color:white" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fas fa-users"></i>&nbsp;Hello, {{name}}  &nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="profile?profileid={{userid}}"> <i class="far fa-user"></i> &nbsp;Profile</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="chatbox?profileid={{userid}}"> <i class="far fa-envelope"></i>&nbsp;Messages</a>&nbsp;&nbsp;</span>
+        <span ><a  class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'" href ="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout</a>&nbsp;&nbsp;</span>
+    </nav>
+    <br><br><br>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-lg-12">
+                <div class="card chat-app">
+                    <div style="height:640px">
+                        <div id="plist" class="people-list" style="margin:5px;padding:5px;width:270px;height:630px;overflow:auto;text-align:justify;">
+                            <div style="height:640px">
+                            <ul class="list-unstyled chat-list mt-2 mb-1">
+                            {% for people in friends %}
+                                    <li class="clearfix" >
+                                        <a href='sharehere?profileid={{people.userid}}&postid={{postid}}' style='color: inherit;text-decoration: inherit;'>
+                                        <img src="{{ people.profilepic.url }}" height="40" width="50" alt="avatar">
+                                        <div class="about">
+                                            <div class="name">{{people.name}}</div>
+                                            <div class="status">{{people.logintime}} </div>                                            
+                                        </div>
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                            </div>  
+                        </div>
+                        <div class="chat">
+                            <div style="height:640px">
+                                <div style="padding-left: 37%;padding-top: 10%;">
+                                    <img class="img-fluid" src="{% static 'assets/img/logo1.jpeg' %}" alt="..." />
+                                </div><br>
+                                <center>
+                                    <h4>Welcome to SociaBook Messaging Service</h4><br>
+                                    <h6>Select the User to share the Post</h6>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

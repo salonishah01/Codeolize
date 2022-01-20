@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <style>
+        #btn{
+            background-color:transparent;
+            border:none;
+            color: black;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.6;
+            transition: 0.3s;
+            padding-left:0;
+            padding-right:0;
+            font-weight: 600;
+            width:80%;
+        }
+        #btn:hover {
+            opacity: 1;
+            background-color: #E4E6E9;
+        }
+        .side-btn:hover{
+            transform: scale(1.125);
+        }
+        h3{
+            opacity:0.75
+        }
+        .side-header{
+            font-size: 1.125rem;
+            font-weight: 750;
+        }
+    </style>
+    <title>{{user.name}} - Feed</title>
+</head>
+<body style="background-color: #f0f2f5;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; top:0px;width:100%; z-index: 1;">
+            <h3><a class="user btn btn-info" style="background-color: #343a40;border:none" onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"     href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+            <form action="search" method="POST">
+            {% csrf_token %}
+            <div style="display: flex;padding-left: 500px;">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" id="button-addon2"><i class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+            </form>
+    </nav>
+    <br><br>
+
+    <div style="display: flex;overflow-y:scroll;height:90%;align-items: center;justify-content: space-between;width:100vw;margin-top:20px">
+        <div style="align-items:left;text-align:center;width: 20%;position: fixed;padding:2rem 2rem">
+            <img src="{{ user.profilepic.url }}"class="rounded-circle"
+                style="border: 1px solid rgb(121, 69, 69); padding:3px;" width="170px" height="170px" />
+            <br><br>
+            <h4>{{user.name}}</h4><br>
+            <p><a class="btn side-btn" id="btn">
+                Posts: {{ user.postct }}
+            </a></p>
+            <p><a  class="btn side-btn" id="btn" href="followers?userid={{user.userid}}">Followers: {{ user.followers }}
+            </a></p>
+            <p><a  class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Following: {{ user.following }}
+            </a></p>
+            <p><a class="btn side-btn" id="btn"href="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost
+            </a></p>
+            <p><a class="btn side-btn" id="btn" href="profile?profileid={{user.userid}}"> <i class="far fa-user"></i> &nbsp;Profile
+            </a></p>
+            
+            <p><a class="btn side-btn" id="btn" href="chatbox?profileid={{user.userid}}"> <i class="far fa-envelope"></i>&nbsp;Messages
+            </a></p>
+            
+            <p><a class="btn side-btn" id="btn"  href="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout
+            </a></p>
+        </div>
+        <div style="width:50%;padding-right: 10px;margin:auto">
+            {% if messages %}
+            {% for message in messages %}
+            <div class='alert alert-{{ message.tags }}'>
+                <center>{{ message }}</center>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            <div>
+                {% for post in posts %}
+                <div style="border:1px solid #e6e6e6;background-color: #ffffff;padding:10px 10px 10px 10px;">
+                    {% for newuser in alluser %}
+                    {% if newuser.userid == post.userid %}
+                    <a href='profile?profileid={{newuser.userid}}' style='color: inherit;text-decoration: inherit;'>
+                        <div style="display:flex;">
+                            <img class="mr-3 rounded-circle" height="40" width="40" src="{{ newuser.profilepic.url }}"
+                                alt="{{ newuser.name }}">
+                            <div class="media-body">
+                                <p style="margin-top: 7px;">{{ newuser.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    <img style="width:100%;height: 300px;" src="{{ post.picture.url }}" alt="{{ post.caption }}">
+                    <p class="mt-1 ml-2">
+                        <a href="like?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            {% if post.postid in like %}
+                            <i class="fas fa-heart"></i>
+                            {% else %}
+                            <i class="far fa-heart"></i>
+                            {% endif %}
+                        </a>
+                        <a href="likedisplay?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            <small>{{post.likecount}} Likes</small>
+                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <i class="far fa-comment" style="color: #000; font-size: 20px;"></i>
+                        <medium>{{post.commentcount}} Comments</medium>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="share?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            <i class="far fa-share-square"></i>
+                            <small>Share</small>
+                        </a>&nbsp;
+                    </p>
+                    <p class="ml-2 mt-0 mb-2">
+                        <b>{{newuser.name}}</b> - <medium>{{ post.caption }}</medium>
+                    </p>
+                    <p class="ml-2 mt-0 mb-2">
+                        <b>Comments:</b><br>
+                    </p>
+                    <div class="card" style="margin:5px;padding:5px;width:99%;height:80px;overflow:auto;text-align:justify;">
+                        {% for com in comment %}
+                        {% if com.postid == post.postid %}
+                        <p><a href='profile?profileid={{com.userid}}'
+                                style='color: inherit;text-decoration: inherit;'><b>@{{com.userid}}</b></a> - <medium>
+                                {{com.comment}}</medium>
+                        </p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <form action="comment" method="POST" name="form3">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@{{userid}}</span>
+                            </div>
+                            <input type="hidden" name="postid" value="{{post.postid}}" />
+                            <input name='comment' type="text" class="form-control" placeholder="write your comment here"
+                                aria-label="Recipient's username" aria-describedby="button-addon2">
+                            <!-- <div class="input-group-append"> -->
+                            <button class="btn btn-outline-secondary" id="button-addon2">Post Comment</button>
+                            <!-- </div> -->
+                        </div>
+                    </form>
+                    <p class="ml-2 mt-0 mb-2">
+                        <small>Post created on: {{ post.datetime }}</small>
+                    </p>
+                    {% endif %}
+                    {% endfor %}
+                </div><br>
+                {% endfor %}
+            </div>
+        </div>
+        <div style="align-items:center;text-align: center;width:15%;position: fixed;right: 15px;">
+            <p class="side-header">IDE</p>
+            <p><a class="btn side-btn" id="btn" href="compiler?problemid=false">Online IDE
+                </a></p>
+                <br>
+            <hr>
+            <br>
+            <p class="side-header">Practice</p>
+            <a class="btn side-btn" id="btn" href="problemlist">Problems <br/> (all Problem List)
+                </a></p>
+            <p><a class="btn side-btn" id="btn" href="problemlistsort">Problems <br /> (by Difficulty Level)
+                </a></p>
+                <br>
+            <hr>
+            <!-- <p class="side-header">Contests</p>
+            <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Present Contests
+                </a></p>
+            <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Upcoming Contests
+                </a></p>
+            <p><a class="btn side-btn" id="btn" href="following?userid={{user.userid}}">Past Contests
+                </a></p>
+            <hr> -->
+            <br>
+            <p class="side-header">Administration</p>
+            <p><a class="btn side-btn" id="btn" href="admin">Admin
+                </a></p>
+        </div>
+    </div>
+</body>
+</html>

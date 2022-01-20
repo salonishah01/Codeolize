@@ -1,0 +1,486 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <title>{{profile.name}} - Profile</title>
+    <style>
+        
+        #submission {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #submission td,
+        #submission th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        #submission tr:hover {
+            background-color: #ddd;
+        }
+
+        #submission th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #333333;
+            color: white;
+        }
+        .highcharts-figure,
+        .highcharts-data-table table {
+            min-width: 100%;
+            max-width: 100%;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+
+        input[type="number"] {
+            min-width: 50px;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            right: auto;
+            left: 0;
+        }
+
+        .dropbtn {
+            background-color: white;
+            padding: 10px;
+            border: none;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: -115px;
+            background-color: white;
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+        style="position: fixed; width:100%; top: 0px;z-index: 1000;">
+        <h3><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'feed' %}"><i class="fas fa-rss-square"></i>&nbsp;Feed</a></h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-0">
+                <input type="text" name="userid" class="form-control" placeholder="Recipient's username"
+                    aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="button-addon2"><i
+                            class="fas fa-search"></i>&nbsp;Search</button>
+                </div>
+            </div>
+        </form>
+        <span
+            style="color:white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
+                class="fas fa-users"></i>&nbsp;Hello, {{name}} &nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'newpost' %}"> <i class="fas fa-plus"></i>&nbsp;NewPost</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="profile?profileid={{userid}}"> <i class="far fa-user"></i> &nbsp;Profile</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="chatbox?profileid={{userid}}"> <i
+                    class="far fa-envelope"></i>&nbsp;Messages</a>&nbsp;&nbsp;</span>
+        <span><a class="user btn btn-info" style="background-color: #343a40;border:none"
+                onMouseOver="this.style.backgroundColor='#000'" onMouseOut="this.style.backgroundColor='#343a40'"
+                href="{% url 'logout' %}"> <i class="fas fa-sign-out-alt"></i>&nbsp;Logout</a>&nbsp;&nbsp;</span>
+    </nav>
+    {% if messages %}
+    {% for message in messages %}
+    <div class='alert alert-{{ message.tags }}' style="margin-top:60px">
+        <center>{{ message }}</center>
+    </div>
+    {% endfor %}
+    {% else %}
+    <br><br>
+    {% endif %}
+
+    <div style="display: flex;justify-content: space-around;align-items:center;">
+        <div class="col-md-6" style="margin-left: 15vw;">
+            <div class="row">
+                <div class="col-sm-4 d-flex justify-content-center">
+                    <img src="{{ profile.profilepic.url }}" alt="@{{profile.userid}}" class="rounded-circle"
+                        style="border: 1px solid rgb(121, 69, 69); padding:3px;" width="200px" height="200px" />
+                </div>
+                <div class="col-sm-8">
+                    <h2 style="font-weight: 100;">
+                        {{ profile.name }}
+                        {% if profile.userid == userid %}
+                        {% else %}
+                        {% if status %}
+                        <a href="unfollow?userid={{userid}}&profileid={{profile.userid}}"
+                            class="ml-5 btn btn-sm btn-outline-info"><i class="fas fa-user-slash"></i>&nbsp;Unfollow</a>
+                        {% else %}
+                        <a href="follow?userid={{userid}}&profileid={{profile.userid}}"
+                            class="ml-5 btn btn-sm btn-outline-info"><i class="fas fa-user-plus"></i>&nbsp;Follow</a>
+                        {% endif %}
+                        {% endif %}
+                        <br>
+                        <small>@{{ profile.userid }}</small>
+                    </h2><br>
+                    <div class="row mt-2" style="font-size: 1.2em">
+                        <table style="width:50%" cellspacing="15">
+                            <tr>
+                                <td style="text-align: center;">{{ profile.postct }}</td>
+                                <td style="text-align: center;">{{ profile.followers }}</td>
+                                <td style="text-align: center;">{{ profile.following }}</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center;">
+                                    <button id="scroll" class="ml-2 btn btn-sm btn-outline-info">
+                                        Post
+                                    </button>
+                                </th>
+                                <th style="text-align: center;">
+                                    <a href="followers?userid={{profile.userid}}"
+                                        class="ml-2 btn btn-sm btn-outline-info">
+                                        Followers
+                                    </a>
+                                </th>
+                                <th style="text-align: center;">
+                                    <a href="following?userid={{profile.userid}}"
+                                        class="ml-2 btn btn-sm btn-outline-info">
+                                        Following
+                                    </a>
+                                </th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div> <br>
+            {% if profile.userid == userid %}
+            <div class="offset-2">
+                <div class="input-group mb-2">
+                    <a href="editprofile?profileid={{userid}}" style="margin-right: 5em"
+                        class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i>&nbsp;Edit Profile</a>
+                    <a href="changepassword?profileid={{userid}}" class="btn btn-outline-secondary"><i
+                            class="fas fa-key"></i>&nbsp;Change Password</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-right: 10vw;">
+            <figure class="highcharts-figure">
+                <div id="container"></div>
+            </figure>
+        </div>
+
+    </div>
+
+    <div style="display: flex;">
+        <div class="container" style="width:60%;float: left;">
+            <div id="here">
+                <hr>
+                <h4>
+                    <p align="center">Posts</p>
+                </h4>
+                <hr>
+            </div>
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-sm-5 col-md-10 offset-md-1 mt-3 p-0 post-container">
+                    {% for newuser in alluser %}
+                    {% if newuser.userid == post.userid %}
+                    <div style="width:100%;padding-top: 10px;padding-bottom: 10px;">
+                        <div style="display: flex;justify-content: space-between;">
+                            <a href='profile?profileid={{newuser.userid}}'
+                                style='color: inherit;text-decoration: inherit;'>
+                                <div style="display: flex;align-items: center;justify-content: space-around;">
+                                    <div style="padding-left: 10px;">
+                                        <img class="mr-3 rounded-circle" height="40" width="40"
+                                            src="{{ newuser.profilepic.url }}" alt="{{ newuser.name }}">
+                                    </div>
+                                    <div>
+                                        {{newuser.name }}
+                                    </div>
+                                </div>
+                            </a>
+                            {% if profile.userid == userid %}
+                            <div>
+                                <div class="dropdown" style="padding-right: 10px;">
+                                    <button class="dropbtn"><i class="fas fa-bars"></i></button>
+                                    <div class="dropdown-content">
+                                        <a href="update?postid={{post.postid}}"><i
+                                                class="far fa-edit"></i>&nbsp;Update</a>
+                                        <a href="delete?postid={{post.postid}}&profileid={{profile.userid}}"
+                                            onclick="return confirm('Are you sure, you want to delete?');"><i
+                                                class="far fa-trash-alt"></i>&nbsp;Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <img style="width: 100%;height:500px;" src="{{ post.picture.url }}" alt="{{ post.caption }}">
+                    <p class="mt-1 ml-2">
+                        <a href="like?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            {% if post.postid in like %}
+                            <i class="fas fa-heart"></i>
+                            {% else %}
+                            <i class="far fa-heart"></i>
+                            {% endif %}
+                        </a>
+                        <a href="likedisplay?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            <small>{{post.likecount}} Likes</small>
+                        </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <i class="far fa-comment" style="color: #000; font-size: 20px;"></i>
+                        <medium>{{post.commentcount}} Comments</medium>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="share?postid={{post.postid}}" style="color: #000; font-size: 20px;">
+                            <i class="far fa-share-square"></i>
+                            <small>Share</small>
+                        </a>&nbsp;
+                    </p>
+                    <p class="ml-2 mt-0 mb-2">
+                        <b>{{newuser.name}}</b> - <medium>{{ post.caption }}</medium>
+                    </p>
+                    <p class="ml-2 mt-0 mb-2">
+                        <b>Comments:</b><br>
+                    </p>
+                    <div class="card"
+                        style="margin:5px;padding:5px;width:99%;height:80px;overflow:auto;text-align:justify;">
+                        {% for com in comment %}
+                        {% if com.postid == post.postid %}
+                        <p><a href='profile?profileid={{com.userid}}'
+                                style='color: inherit;text-decoration: inherit;'><b>@{{com.userid}}</b></a> - <medium>
+                                {{com.comment}}</medium>
+                        </p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <form action="comment" method="POST" name="form3">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@{{userid}}</span>
+                            </div>
+                            <input type="hidden" name="postid" value="{{post.postid}}" />
+                            <input name='comment' type="text" class="form-control" placeholder="write your comment here"
+                                aria-label="Recipient's username" aria-describedby="button-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" id="button-addon2">Post Comment</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="ml-2 mt-0 mb-2">
+                        <small>Posted on: {{ post.datetime }}</small>
+                    </p>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div style="margin-right: 1vw;">
+            <div id="here">
+                <hr>
+                <h4>
+                    <p align="center">Submissions</p>
+                </h4>
+                <hr>
+            </div>
+            <br>
+            <table id="submission">
+                <tr>
+                    <th style="background-color:rgb(45, 124, 45)">Accepted</th>
+                    <th style="background-color:rgb(180, 6, 6);">WrongAnswer</th>
+                    <th style="background-color:rgb(139, 139, 0);">TimeLimitExceeded</th>
+                    <th style="background-color:rgb(124, 4, 4);">CompilationError</th>
+                    <th style="background-color:rgb(180, 6, 6);">RuntimeError</th>
+                </tr>
+                <tr>
+                    <td>{{userstats.accept}}</td>
+                    <td>{{userstats.werror}}</td>
+                    <td>{{userstats.terror}}</td>
+                    <td>{{userstats.cerror}}</td>
+                    <td>{{userstats.rerror}}</td>
+                </tr>
+            </table>
+            <p></p>
+            <table id="submission">
+                <tr>
+                    <th>TimeStamp</th>
+                    <th>User</th>
+                    <th>Problem</th>
+                    <th>Language</th>
+                    <th>Time</th>
+                    <th>Memory</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Solution</th>
+                </tr>
+                {% for each in subs %}
+                <tr>
+                    <td>{{each.timestamp}}</td>
+                    <td>{{each.userid}}</td>
+                    <td>{{each.problemtitle}}</td>
+                    <td>{{each.langname}}</td>
+                    <td>{{each.time}}</td>
+                    <td>{{each.memory}}</td>
+                    <td>{{each.score}}</td>
+                    <td>
+                        {% if each.status == "time limit exceeded" %}
+                            <i class="far fa-clock" style="color: rgb(139, 139, 0);"></i>
+                        {% elif each.status == "accepted" %}
+                            <i class="fas fa-check" style="color:rgb(45, 124, 45)"></i>
+                        {% else %}
+                            <i class="fas fa-times" style="color:rgb(180, 6, 6)"></i>
+                        {% endif %}
+                    </td>
+                    <td><a href="solution?submissionid={{each.submissionid}}">View</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $("#scroll").click(function () {
+        $('html,body').animate({
+            scrollTop: $("#here").offset().top
+        },
+            'slow');
+    });
+</script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script type="text/javascript">
+    Highcharts.chart('container', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'User Submission History'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        accessibility: {
+            point: {
+                valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                }
+            }
+        },
+        series: [{
+            name: 'Score',
+            colorByPoint: true,
+            data: [
+                {
+                    name: 'Accepted',
+                    y: {{ userstats.accept }},
+            sliced: true,
+            selected: true
+                }, {
+        name: 'Compilation Error',
+        y: {{ userstats.cerror }}
+                }, {
+            name: 'Runtime Error',
+            y: {{ userstats.rerror }}
+                }, {
+            name: 'Time Limit Exceeded',
+            y: {{ userstats.terror }}
+                }, {
+            name: 'WrongAnswer',
+            y: {{ userstats.werror }}
+                }]
+            }]
+        });
+</script>
+
+</html>

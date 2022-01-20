@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"0>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link href="{% static 'css/auth.css' %}" rel="stylesheet"> 
+    <title>{{name}} - Edit</title>
+</head>
+<body>
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <form action="editprofile" method="POST" class="login100-form validate-form p-l-55 p-r-55 p-t-178" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <b>Note: </b>Anything you update here changes permanently. You cannot change the Username.Overwrite the below content to change.<br><br>
+                    <span class="login100-form-title">
+                        Edit your Profile
+                    </span>
+                    {% if messages %}
+                    {% for message in messages %}
+                        <div class='alert alert-{{ message.tags }}'>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                    <!-- userid -->
+                    <div class="wrap-input100 validate-input m-b-16" data-validate="Please enter username">
+                        <input class="input100" type="text" name="userid" value="{{profile.userid}}" readonly>
+                        <span class="focus-input100"></span>
+                    </div>
+                    <!-- username -->
+                    <div class="wrap-input100 validate-input m-b-16" data-validate="Please enter name">
+                        <input class="input100" type="text" value="{{profile.name}}" name="name">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <!-- useremail -->
+                    <div class="wrap-input100 validate-input" data-validate = "Please enter email">
+                        <input class="input100" type="text" value="{{profile.emailid}}" name="emailid" placeholder="Email ID">
+                        <span class="focus-input100"></span>
+                    </div><br>
+                    <!-- userprofile -->
+                    <div class="wrap-input100 validate-input" data-validate = "Please upload Profile Picture">
+                        <label for="exampleFormControlFile1" style="padding-left: 34px;padding-top: 10px;">Profile Picture:</label>
+                        <br><input class="input100" type="file" accept="image/*" name="profilepic">
+                        <span class="focus-input100"></span>
+                    </div><br>
+                    
+                    <label class="form-control" aria-label="Text input with checkbox"><input type="checkbox" name="status">&nbsp;Update Profile Picture?</label>
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn">
+                            Update Profile
+                        </button>
+                    </div>
+                    <div class="flex-col-c p-t-30 p-b-40">
+                        <span class="txt1 p-b-9">
+                            Don't want to Change ? 
+                        </span>
+                        <a href="{% url 'feed' %}" class="txt3">
+                            Go Back
+                        </a>
+                    </div><br>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
